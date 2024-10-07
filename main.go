@@ -24,25 +24,20 @@ func main() {
 	var mydb SqliteConnection
 	mydb.DB = db
 	mydb.Err = nil
-	query := mydb.From("users").Select("*")
-	if query.Err != nil {
-		log.Fatal(fmt.Errorf("failed to create query string: %w", query.Err))
-	}
-	rows, err := mydb.DB.Query(query.Query)
+	rows, err := mydb.From("users").Select("age, name").Eq("age", 25).Eq("name", "alec").OrderBy("name").Query()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Errorf("failed to execute query: %w", err))
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var name string
 		var age string
-		var id int
-		err := rows.Scan(&id, &age, &name)
+		err := rows.Scan(&age, &name)
 		if err != nil {
 			log.Fatal(fmt.Errorf("failed to scan rows %w", err))
 		}
-		log.Println(name, age, id)
+		log.Println(name, age)
 	}
 
 }
